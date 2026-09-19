@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LDC Jobs Pipeline</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#142033;--muted:#718096;--line:#e5eaf1;--nav:#0c1b2a;--blue:#2f80ed;--purple:#8758d5;--green:#1e9e72;--red:#dc3545;--amber:#e6a700}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:20;background:var(--nav);color:#fff;padding:13px max(16px,4vw);display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 15px #0002}
+.brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:750}.logo{background:#fff;color:var(--nav);border-radius:9px;padding:8px 10px;font-weight:900}
+button{font:inherit;font-weight:700;border:0;border-radius:9px;padding:10px 14px;cursor:pointer}.primary{background:var(--blue);color:#fff}.danger{background:#fff0f1;color:var(--red)}.ghost{background:#eef2f7;color:#354052}
+main{max-width:1500px;margin:22px auto;padding:0 16px}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 15px #1522380b}.card{padding:15px}.card small{color:var(--muted)}.card strong{display:block;font-size:26px;margin-top:7px}.card.alert{border-left:4px solid var(--red)}
+.panel{padding:17px;margin-bottom:16px}.head{display:flex;align-items:center;justify-content:space-between;gap:15px}.head h2,.panel h2{font-size:17px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:5px}.legend{font-size:12px;color:#5e6979;white-space:nowrap}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 5px 0 10px}.dd{background:var(--blue)}.gyro{background:var(--purple)}.other{background:var(--green)}
+#timelineWrap{overflow:auto;margin-top:15px;border:1px solid var(--line);border-radius:11px}.timeline{min-width:1050px}.dates,.jobrow{display:grid;grid-template-columns:190px repeat(21,minmax(40px,1fr));position:relative}.dates{background:#f8fafc;position:sticky;top:0;z-index:3}.dates>div{padding:9px 3px;text-align:center;font-size:10px;color:var(--muted);border-left:1px solid var(--line)}.dates>div:first-child{text-align:left;padding-left:12px;border:0}.jobrow{min-height:60px;border-top:1px solid var(--line);align-items:center;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc((100% - 190px)/21 - 1px),#f0f2f5 calc((100% - 190px)/21 - 1px),#f0f2f5 calc((100% - 190px)/21));background-position:190px 0;background-size:calc(100% - 190px) 100%;background-repeat:no-repeat}
+.joblabel{grid-column:1;padding:9px 10px;z-index:2;background:#fff}.joblabel b,.joblabel small{display:block}.joblabel small{color:var(--muted);margin-top:3px;font-size:11px}.jobbar{height:36px;border-radius:8px;color:#fff;padding:9px 10px;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;z-index:2;touch-action:none;cursor:grab;position:relative}.jobbar.dd{background:var(--blue)}.jobbar.gyro{background:var(--purple)}.jobbar.other{background:var(--green)}.jobbar.conflict{outline:3px solid var(--red);outline-offset:2px}.jobbar:after{content:"";position:absolute;right:0;top:0;width:12px;height:100%;background:#ffffff2b;cursor:ew-resize}
+.twoCol{display:grid;grid-template-columns:1fr 1fr;gap:16px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.table{margin-top:12px}.tr{display:grid;grid-template-columns:1.5fr .8fr .8fr .8fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.th{font-size:11px;color:var(--muted);font-weight:800}.badge{display:inline-block;border-radius:99px;padding:4px 8px;background:#edf4ff;color:#2167c7;font-size:11px;font-weight:800}.bad{color:var(--red);font-weight:800}.good{color:#16834c;font-weight:800}.alertBox{background:#fff3f3;border-left:4px solid var(--red);padding:12px;border-radius:8px;margin-top:10px;font-size:12px}.empty{color:var(--muted);padding:18px 0}
+dialog{width:min(520px,94vw);border:0;border-radius:16px;padding:0;box-shadow:0 25px 80px #0006}dialog::backdrop{background:#0a122080}.form{padding:20px}.form h2{margin:0 0 5px}.form label{display:block;font-size:12px;font-weight:800;margin-top:12px}.form input,.form select{width:100%;padding:11px;border:1px solid #d6dde7;border-radius:8px;margin-top:5px;background:#fff;font:inherit}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;justify-content:space-between;gap:8px;margin-top:18px}.right{display:flex;gap:8px}.hint{font-size:11px;color:var(--muted);margin-top:8px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.twoCol{grid-template-columns:1fr}.head{align-items:flex-start;flex-direction:column}.legend{white-space:normal}.tr{grid-template-columns:1.3fr .7fr .7fr auto}.tr>*:nth-child(4){display:none}}
+
+.opsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}.opsCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.opsCard b{font-size:22px;display:block;margin-top:6px}.attention{border-left:4px solid #dc2626}.ready{color:#15803d}.warn{color:#dc2626}.checklist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.check{padding:9px;border-radius:8px;background:#f3f6fa;font-size:12px}.check.ok{background:#eaf8f0;color:#166534}.check.no{background:#fff1f2;color:#b91c1c}.liveUpdate{font-size:13px;line-height:1.55}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef4ff;color:#174a8b;font-size:11px;font-weight:700}@media(max-width:850px){.opsGrid{grid-template-columns:repeat(2,1fr)}.checklist{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="logo">LDC</span>Jobs Pipeline</div><div class="toolbar"><button class="ghost" onclick="openTool()">+ Tool</button><button class="primary" onclick="openJob()">+ Add Job</button></div></header>
+<main>
+<section class="cards">
+<div class="card"><small>Total Jobs</small><strong id="total">0</strong></div>
+<div class="card"><small>Ongoing</small><strong id="ongoing">0</strong></div>
+<div class="card"><small>Planned</small><strong id="planned">0</strong></div>
+<div class="card"><small>Completed</small><strong id="completed">0</strong></div>
+<div class="card alert"><small>Tool Conflicts</small><strong id="conflictCount">0</strong></div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>Operations Control Center</h2><div class="sub">Readiness, live operations and resources requiring attention.</div></div><span class="badge">LIVE VIEW</span></div>
+<div class="opsGrid">
+<div class="opsCard attention"><small>Needs Attention</small><b class="warn" id="needsAttention">0</b><div class="sub">Tool conflicts + jobs not ready</div></div>
+<div class="opsCard"><small>Jobs Ready</small><b class="ready" id="readyJobs">0</b><div class="sub">Ready for mobilization</div></div>
+<div class="opsCard"><small>Active Operations</small><b id="activeOps">0</b><div class="sub">Jobs currently ongoing</div></div>
+<div class="opsCard"><small>Maintenance Due</small><b id="maintenanceDue">1</b><div class="sub">Equipment requiring review</div></div>
+</div>
+<div class="twoCol" style="margin-top:14px">
+<div class="opsCard"><h3>Job Readiness</h3><div id="readiness"></div></div>
+<div class="opsCard"><h3>Live Operations Update</h3><div id="liveOps" class="liveUpdate"></div></div>
+</div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>Operations Timeline</h2><div class="sub">Drag a job left/right to shift dates. Drag the right edge to change the end date. Tap a job to edit.</div></div>
+<div class="legend"><span class="dot dd"></span>DD / MWD <span class="dot gyro"></span>Gyro / WL <span class="dot other"></span>Other</div></div>
+<div id="timelineWrap"><div id="timeline"></div></div>
+</section>
+
+<section class="twoCol">
+<div class="panel"><div class="head"><div><h2>Tool Inventory</h2><div class="sub">Availability is checked automatically across overlapping jobs.</div></div></div><div id="inventoryTable" class="table"></div></div>
+<div class="panel"><h2>Conflict Alerts</h2><div id="alerts"></div></div>
+</section>
+</main>
+
+<dialog id="jobDlg"><form class="form" id="jobForm"><h2 id="jobTitle">Add Job</h2>
+<input type="hidden" id="jobId">
+<label>Job / Well<input id="jname" required placeholder="e.g. R47 / ADWOC19"></label>
+<label>Client / Rig<input id="jclient" placeholder="e.g. Waha Oil / Rig 19"></label>
+<label>Service Line<select id="jservice"><option>DD / MWD</option><option>Gyro / WL</option><option>Other</option></select></label>
+<div class="row2"><label>Start Date<input id="jstart" type="date" required></label><label>End Date<input id="jend" type="date" required></label></div>
+<label>Status<select id="jstatus"><option>Planned</option><option>Ongoing</option><option>Completed</option></select></label>
+<label>Required Tool<select id="jtool"></select></label>
+<label>Quantity Required<input id="jqty" type="number" min="0" value="0"></label>
+<div class="actions"><button type="button" id="deleteJob" class="danger" onclick="removeJob()">Delete</button><div class="right"><button type="button" class="ghost" onclick="jobDlg.close()">Cancel</button><button class="primary">Save</button></div></div>
+<div class="hint">Prototype data is saved on this browser/device.</div>
+</form></dialog>
+
+<dialog id="toolDlg"><form class="form" id="toolForm"><h2>Add Inventory Tool</h2>
+<label>Tool Type<input id="tname" required placeholder='e.g. Motor'></label>
+<label>Size<input id="tsize" required placeholder='e.g. 8"'></label>
+<label>Total Quantity<input id="tqty" type="number" min="0" required value="1"></label>
+<div class="actions"><span></span><div class="right"><button type="button" class="ghost" onclick="toolDlg.close()">Cancel</button><button class="primary">Save Tool</button></div></div>
+</form></dialog>
+
+<script>
+const DAY=86400000;
+const defaultTools=[{id:'motor8',name:'Motor',size:'8"',qty:6},{id:'motor675',name:'Motor',size:'6 3/4"',qty:4},{id:'motor475',name:'Motor',size:'4 3/4"',qty:4},{id:'nmdc475',name:'NMDC',size:'4 3/4"',qty:6},{id:'ubho475',name:'NM UBHO',size:'4 3/4"',qty:6},{id:'pulser',name:'MWD Pulser',size:'APS',qty:5}];
+const defaultJobs=[
+{id:1,name:'R47 / ADWOC19',client:'Waha Oil',service:'DD / MWD',start:'2026-09-18',end:'2026-09-23',status:'Ongoing',tool:'motor8',qty:2},
+{id:2,name:'H53I / Al-Laheeb01',client:'AGOCO',service:'DD / MWD',start:'2026-09-20',end:'2026-09-25',status:'Ongoing',tool:'motor8',qty:2},
+{id:3,name:'C23HR-47',client:'SOC',service:'DD / MWD',start:'2026-09-21',end:'2026-09-26',status:'Planned',tool:'motor8',qty:2},
+{id:4,name:'Gyro Orientation',client:'Operations',service:'Gyro / WL',start:'2026-09-22',end:'2026-09-24',status:'Planned',tool:'pulser',qty:0}
+];
+let tools=JSON.parse(localStorage.getItem('ldc_tools_v2')||'null')||defaultTools;
+let jobs=JSON.parse(localStorage.getItem('ldc_jobs_v2')||'null')||defaultJobs;
+const $=id=>document.getElementById(id), iso=d=>new Date(d).toISOString().slice(0,10);
+function persist(){localStorage.setItem('ldc_tools_v2',JSON.stringify(tools));localStorage.setItem('ldc_jobs_v2',JSON.stringify(jobs));render()}
+function toolName(id){let t=tools.find(x=>x.id===id);return t?t.name+' '+t.size:'No tool'}
+function cls(s){return s==='DD / MWD'?'dd':s==='Gyro / WL'?'gyro':'other'}
+function overlap(a,b,date){return a.start<=date&&a.end>=date&&b.start<=date&&b.end>=date}
+function conflicts(){
+ const res=[];
+ tools.forEach(t=>{
+   const dates=[...new Set(jobs.flatMap(j=>[j.start,j.end]))].sort();
+   let start=new Date(Math.min(...jobs.map(j=>new Date(j.start))),0);
+   let end=new Date(Math.max(...jobs.map(j=>new Date(j.end))),0);
+   if(!isFinite(start)||!isFinite(end))return;
+   for(let d=new Date(start);d<=end;d=new Date(d.getTime()+DAY)){
+     const ds=iso(d), active=jobs.filter(j=>j.tool===t.id&&j.start<=ds&&j.end>=ds&&j.status!=='Completed');
+     const req=active.reduce((s,j)=>s+(+j.qty||0),0);
+     if(req>t.qty)res.push({date:ds,tool:t,req,short:req-t.qty,jobs:active.map(j=>j.id)});
+   }
+ });
+ return res;
+}
+function render(){
+ $('total').textContent=jobs.length;$('ongoing').textContent=jobs.filter(j=>j.status==='Ongoing').length;$('planned').textContent=jobs.filter(j=>j.status==='Planned').length;$('completed').textContent=jobs.filter(j=>j.status==='Completed').length;
+ const cf=conflicts(), conflictIds=new Set(cf.flatMap(x=>x.jobs)); $('conflictCount').textContent=new Set(cf.map(x=>x.tool.id)).size;
+ const conflictTools=new Set(cf.map(x=>x.tool.id)).size;
+ const readinessScore=j=>{let n=45;if(j.tool&&(+j.qty||0)>0)n+=25;if(j.client)n+=15;if(j.start&&j.end)n+=15;return Math.min(100,n)};
+ const notReady=jobs.filter(j=>j.status!=='Completed'&&readinessScore(j)<85).length;
+ $('needsAttention').textContent=conflictTools+notReady;
+ $('readyJobs').textContent=jobs.filter(j=>j.status!=='Completed'&&readinessScore(j)>=85).length;
+ $('activeOps').textContent=jobs.filter(j=>j.status==='Ongoing').length;
+ $('readiness').innerHTML=jobs.filter(j=>j.status!=='Completed').slice(0,5).map(j=>{let r=readinessScore(j);return `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><b>${esc(j.name)}</b><b class="${r>=85?'ready':'warn'}">${r}%</b></div><div class="checklist"><span class="check ok">Dates ✓</span><span class="check ${j.tool&&(+j.qty||0)>0?'ok':'no'}">Tools ${j.tool&&(+j.qty||0)>0?'✓':'!'}</span><span class="check ${j.client?'ok':'no'}">Client ${j.client?'✓':'!'}</span></div></div>`}).join('')||'<div class="sub">No active jobs</div>';
+ $('liveOps').innerHTML=jobs.filter(j=>j.status==='Ongoing').map(j=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>${esc(j.name)}</b><br><span>${esc(j.client)} · ${esc(j.service)}</span><br><span class="badge">ONGOING</span> &nbsp; ${j.start} → ${j.end}</div>`).join('')||'<div class="sub">No ongoing operations</div>';
+ let min=jobs.length?new Date(Math.min(...jobs.map(j=>new Date(j.start)))):new Date(), base=new Date(min);base.setDate(base.getDate()-1);
+ const days=[...Array(21)].map((_,i)=>new Date(base.getTime()+i*DAY));
+ let h='<div class="timeline"><div class="dates"><div>JOB / WELL</div>'+days.map(d=>'<div>'+d.toLocaleDateString('en',{day:'2-digit',month:'short'})+'</div>').join('')+'</div>';
+ jobs.forEach(j=>{
+   let s=Math.max(0,Math.round((new Date(j.start)-base)/DAY)), e=Math.min(20,Math.round((new Date(j.end)-base)/DAY));
+   h+=`<div class="jobrow"><div class="joblabel"><b>${esc(j.name)}</b><small>${esc(j.client)} · ${j.status}</small></div><div class="jobbar ${cls(j.service)} ${conflictIds.has(j.id)?'conflict':''}" data-id="${j.id}" style="grid-column:${s+2}/span ${Math.max(1,e-s+1)}">${esc(j.name)}</div></div>`;
+ });
+ $('timeline').innerHTML=h+'</div>';
+ bindBars();
+ $('inventoryTable').innerHTML='<div class="tr th"><span>TOOL</span><span>TOTAL</span><span>PEAK USED</span><span>AVAILABLE</span><span></span></div>'+tools.map(t=>{
+   let peak=0; jobs.filter(j=>j.tool===t.id&&j.status!=='Completed').forEach(j=>{for(let d=new Date(j.start);d<=new Date(j.end);d=new Date(d.getTime()+DAY)){let ds=iso(d),used=jobs.filter(x=>x.tool===t.id&&x.status!=='Completed'&&x.start<=ds&&x.end>=ds).reduce((s,x)=>s+(+x.qty||0),0);peak=Math.max(peak,used)}}); let av=t.qty-peak;
+   return `<div class="tr"><span><b>${esc(t.name)}</b> <span class="badge">${esc(t.size)}</span></span><span>${t.qty}</span><span>${peak}</span><span class="${av<0?'bad':'good'}">${av}</span><button class="ghost" onclick="editToolQty('${t.id}')">Edit</button></div>`
+ }).join('');
+ if(!cf.length)$('alerts').innerHTML='<div class="empty good">✓ No tool conflicts detected.</div>'; else {
+   let grouped={};cf.forEach(c=>{let k=c.tool.id;if(!grouped[k]||c.short>grouped[k].short)grouped[k]=c});
+   $('alerts').innerHTML=Object.values(grouped).map(c=>`<div class="alertBox"><b>${esc(c.tool.name)} ${esc(c.tool.size)} shortage</b><br>Required: ${c.req} · Available: ${c.tool.qty} · <span class="bad">Shortage: ${c.short}</span><br><span class="sub">Conflict around ${c.date}</span></div>`).join('');
+ }
+ fillTools();
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function fillTools(){let old=$('jtool').value;$('jtool').innerHTML='<option value="">No tool</option>'+tools.map(t=>`<option value="${t.id}">${esc(t.name)} ${esc(t.size)} — ${t.qty} total</option>`).join('');if(old)$('jtool').value=old}
+function openJob(id){
+ $('jobForm').reset();$('jobId').value='';$('deleteJob').style.visibility='hidden';$('jobTitle').textContent='Add Job';fillTools();
+ let today=iso(new Date());$('jstart').value=today;$('jend').value=today;
+ if(id){let j=jobs.find(x=>x.id===id);if(!j)return;$('jobTitle').textContent='Edit Job';$('jobId').value=j.id;$('jname').value=j.name;$('jclient').value=j.client;$('jservice').value=j.service;$('jstart').value=j.start;$('jend').value=j.end;$('jstatus').value=j.status;$('jtool').value=j.tool||'';$('jqty').value=j.qty||0;$('deleteJob').style.visibility='visible'}
+ $('jobDlg').showModal();
+}
+$('jobForm').onsubmit=e=>{e.preventDefault();if($('jend').value<$('jstart').value){alert('End date must be after start date.');return}let id=+$('jobId').value,obj={id:id||Date.now(),name:$('jname').value,client:$('jclient').value,service:$('jservice').value,start:$('jstart').value,end:$('jend').value,status:$('jstatus').value,tool:$('jtool').value,qty:+$('jqty').value||0};if(id)jobs=jobs.map(j=>j.id===id?obj:j);else jobs.push(obj);$('jobDlg').close();persist()}
+function removeJob(){let id=+$('jobId').value;if(id&&confirm('Delete this job?')){jobs=jobs.filter(j=>j.id!==id);$('jobDlg').close();persist()}}
+function openTool(){$('toolForm').reset();$('tqty').value=1;$('toolDlg').showModal()}
+$('toolForm').onsubmit=e=>{e.preventDefault();tools.push({id:'t'+Date.now(),name:$('tname').value,size:$('tsize').value,qty:+$('tqty').value});$('toolDlg').close();persist()}
+function editToolQty(id){let t=tools.find(x=>x.id===id),q=prompt(`Total quantity for ${t.name} ${t.size}:`,t.qty);if(q!==null&&!isNaN(q)&&+q>=0){t.qty=+q;persist()}}
+function bindBars(){
+ document.querySelectorAll('.jobbar').forEach(el=>{
+   let sx=0,mode='move',moved=false,id=+el.dataset.id;
+   el.addEventListener('pointerdown',e=>{sx=e.clientX;moved=false;let r=el.getBoundingClientRect();mode=e.clientX>r.right-18?'resize':'move';el.setPointerCapture(e.pointerId)});
+   el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture(e.pointerId))return;if(Math.abs(e.clientX-sx)>8)moved=true});
+   el.addEventListener('pointerup',e=>{let dx=e.clientX-sx;if(moved){let shift=Math.round(dx/42),j=jobs.find(x=>x.id===id);if(shift){if(mode==='resize'){let nd=new Date(j.end);nd.setDate(nd.getDate()+shift);if(nd>=new Date(j.start))j.end=iso(nd)}else{['start','end'].forEach(k=>{let d=new Date(j[k]);d.setDate(d.getDate()+shift);j[k]=iso(d)})}persist()}}else openJob(id)});
+ });
+}
+render();
+</script>
+</body></html>
