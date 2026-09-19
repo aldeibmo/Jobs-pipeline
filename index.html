@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LDC Jobs Pipeline</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div class="brand"><b>LDC</b><span>Jobs Pipeline</span></div><button id="add">+ Add Job</button></header>
+<main>
+<section class="cards"><article><small>Total Jobs</small><strong id="total"></strong></article><article><small>Ongoing</small><strong id="ongoing"></strong></article><article><small>Planned</small><strong id="planned"></strong></article><article class="warn"><small>Tool Conflicts</small><strong id="conflicts"></strong></article></section>
+<section class="panel"><div class="head"><div><h2>Operations Timeline</h2><p>Drag a job to shift its dates.</p></div><div class="legend"><i class="dd"></i> DD / MWD <i class="gyro"></i> Gyro / WL <i class="other"></i> Other</div></div><div id="timeline"></div></section>
+<section class="grid"><div class="panel"><h2>Tool Availability</h2><div id="inventory"></div></div><div class="panel"><h2>Alerts</h2><div id="alerts"></div></div></section>
+</main>
+<dialog id="modal"><form id="form"><h2>Add Job</h2>
+<label>Job / Well<input id="name" required placeholder="e.g. R47 / ADWOC19"></label>
+<label>Client<input id="client" placeholder="Waha / AGOCO / SOC"></label>
+<label>Service Line<select id="service"><option>DD / MWD</option><option>Gyro / WL</option><option>Other</option></select></label>
+<div class="two"><label>Start<input id="start" type="date" required></label><label>End<input id="end" type="date" required></label></div>
+<label>Status<select id="status"><option>Planned</option><option>Ongoing</option><option>Completed</option></select></label>
+<label>8&quot; Motors Required<input id="motors" type="number" min="0" value="2"></label>
+<div class="actions"><button type="button" id="cancel">Cancel</button><button class="primary">Save Job</button></div></form></dialog>
+<script src="app.js"></script></body></html>
