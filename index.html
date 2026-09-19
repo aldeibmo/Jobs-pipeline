@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LDC Jobs Pipeline</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#142033;--muted:#718096;--line:#e5eaf1;--nav:#0c1b2a;--blue:#2f80ed;--purple:#8758d5;--green:#1e9e72;--red:#dc3545;--amber:#e6a700}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:20;background:var(--nav);color:#fff;padding:13px max(16px,4vw);display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 15px #0002}
+.brand{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:750}.logo{background:#fff;color:var(--nav);border-radius:9px;padding:8px 10px;font-weight:900}
+button{font:inherit;font-weight:700;border:0;border-radius:9px;padding:10px 14px;cursor:pointer}.primary{background:var(--blue);color:#fff}.danger{background:#fff0f1;color:var(--red)}.ghost{background:#eef2f7;color:#354052}
+main{max-width:1500px;margin:22px auto;padding:0 16px}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 3px 15px #1522380b}.card{padding:15px}.card small{color:var(--muted)}.card strong{display:block;font-size:26px;margin-top:7px}.card.alert{border-left:4px solid var(--red)}
+.panel{padding:17px;margin-bottom:16px}.head{display:flex;align-items:center;justify-content:space-between;gap:15px}.head h2,.panel h2{font-size:17px;margin:0}.sub{font-size:12px;color:var(--muted);margin-top:5px}.legend{font-size:12px;color:#5e6979;white-space:nowrap}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 5px 0 10px}.dd{background:var(--blue)}.gyro{background:var(--purple)}.other{background:var(--green)}
+#timelineWrap{overflow:auto;margin-top:15px;border:1px solid var(--line);border-radius:11px}.timeline{min-width:1050px}.dates,.jobrow{display:grid;grid-template-columns:190px repeat(21,minmax(40px,1fr));position:relative}.dates{background:#f8fafc;position:sticky;top:0;z-index:3}.dates>div{padding:9px 3px;text-align:center;font-size:10px;color:var(--muted);border-left:1px solid var(--line)}.dates>div:first-child{text-align:left;padding-left:12px;border:0}.jobrow{min-height:60px;border-top:1px solid var(--line);align-items:center;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc((100% - 190px)/21 - 1px),#f0f2f5 calc((100% - 190px)/21 - 1px),#f0f2f5 calc((100% - 190px)/21));background-position:190px 0;background-size:calc(100% - 190px) 100%;background-repeat:no-repeat}
+.joblabel{grid-column:1;padding:9px 10px;z-index:2;background:#fff}.joblabel b,.joblabel small{display:block}.joblabel small{color:var(--muted);margin-top:3px;font-size:11px}.jobbar{height:36px;border-radius:8px;color:#fff;padding:9px 10px;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;z-index:2;touch-action:none;cursor:grab;position:relative}.jobbar.dd{background:var(--blue)}.jobbar.gyro{background:var(--purple)}.jobbar.other{background:var(--green)}.jobbar.conflict{outline:3px solid var(--red);outline-offset:2px}.jobbar:after{content:"";position:absolute;right:0;top:0;width:12px;height:100%;background:#ffffff2b;cursor:ew-resize}
+.twoCol{display:grid;grid-template-columns:1fr 1fr;gap:16px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.table{margin-top:12px}.tr{display:grid;grid-template-columns:1.5fr .8fr .8fr .8fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.th{font-size:11px;color:var(--muted);font-weight:800}.badge{display:inline-block;border-radius:99px;padding:4px 8px;background:#edf4ff;color:#2167c7;font-size:11px;font-weight:800}.bad{color:var(--red);font-weight:800}.good{color:#16834c;font-weight:800}.alertBox{background:#fff3f3;border-left:4px solid var(--red);padding:12px;border-radius:8px;margin-top:10px;font-size:12px}.empty{color:var(--muted);padding:18px 0}
+dialog{width:min(520px,94vw);border:0;border-radius:16px;padding:0;box-shadow:0 25px 80px #0006}dialog::backdrop{background:#0a122080}.form{padding:20px}.form h2{margin:0 0 5px}.form label{display:block;font-size:12px;font-weight:800;margin-top:12px}.form input,.form select{width:100%;padding:11px;border:1px solid #d6dde7;border-radius:8px;margin-top:5px;background:#fff;font:inherit}.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;justify-content:space-between;gap:8px;margin-top:18px}.right{display:flex;gap:8px}.hint{font-size:11px;color:var(--muted);margin-top:8px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.twoCol{grid-template-columns:1fr}.head{align-items:flex-start;flex-direction:column}.legend{white-space:normal}.tr{grid-template-columns:1.3fr .7fr .7fr auto}.tr>*:nth-child(4){display:none}}
+
+.opsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}.opsCard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px}.opsCard b{font-size:22px;display:block;margin-top:6px}.attention{border-left:4px solid #dc2626}.ready{color:#15803d}.warn{color:#dc2626}.checklist{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.check{padding:9px;border-radius:8px;background:#f3f6fa;font-size:12px}.check.ok{background:#eaf8f0;color:#166534}.check.no{background:#fff1f2;color:#b91c1c}.liveUpdate{font-size:13px;line-height:1.55}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eef4ff;color:#174a8b;font-size:11px;font-weight:700}@media(max-width:850px){.opsGrid{grid-template-columns:repeat(2,1fr)}.checklist{grid-template-columns:1fr 1fr}}
+</style>
+
+<style>
+.attentionList{display:grid;gap:8px;margin-top:10px}.attentionList div{display:flex;justify-content:space-between;padding:9px 10px;background:#f8fafc;border-radius:8px}
+.miniBoard{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.miniBoard span{padding:9px;background:#f8fafc;border-radius:8px;font-size:12px}.miniBoard b{float:right}
+.kpiMini{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.kpiMini div{background:#f8fafc;padding:10px;border-radius:8px}.kpiMini b{display:block;font-size:20px;margin-top:3px}
+.docGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.docGrid span{padding:10px;background:#f8fafc;border:1px solid #e4eaf1;border-radius:8px;text-align:center;font-size:12px}
+.activity{margin-top:12px;border-top:1px solid #e6ebf2;padding-top:10px}.activity div{font-size:12px;padding:6px 0;color:#536174}
+.readinessRow{display:grid;grid-template-columns:1.3fr 2fr 60px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #edf1f5}.progress{height:8px;background:#e8edf3;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:#173c6b;border-radius:10px}
+.statusPill{display:inline-block;padding:4px 8px;border-radius:999px;background:#edf4ff;font-size:11px}.statusPill.due{background:#fff0f0;color:#b42318}
+@media(max-width:850px){.docGrid{grid-template-columns:repeat(2,1fr)}.readinessRow{grid-template-columns:1fr}.miniBoard{grid-template-columns:1fr 1fr}}
+</style>
+
+
+<style>
+.ldcOfficialLogo{height:48px;width:auto;display:block;object-fit:contain}
+@media(max-width:850px){.ldcOfficialLogo{height:40px}}
+</style>
+
+</head>
+<body>
+<header><div class="brand"><img class="ldcOfficialLogo" src="data:image/jpeg;base64,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" alt="LDC">Jobs Pipeline</div><div class="toolbar"><button class="ghost" onclick="openTool()">+ Tool</button><button class="primary" onclick="openJob()">+ Add Job</button></div></header>
+<main>
+<section class="cards">
+<div class="card"><small>Total Jobs</small><strong id="total">0</strong></div>
+<div class="card"><small>Ongoing</small><strong id="ongoing">0</strong></div>
+<div class="card"><small>Planned</small><strong id="planned">0</strong></div>
+<div class="card"><small>Completed</small><strong id="completed">0</strong></div>
+<div class="card alert"><small>Tool Conflicts</small><strong id="conflictCount">0</strong></div>
+</section>
+
+<section class="panel">
+<div class="head"><div><h2>Operations Control Center</h2><div class="sub">Readiness, live operations and resources requiring attention.</div></div><span class="badge">LIVE VIEW</span></div>
+<div class="opsGrid">
+<div class="opsCard attention"><small>Needs Attention</small><b class="warn" id="needsAttention">0</b><div class="sub">Tool conflicts + jobs not ready</div></div>
+<div class="opsCard"><small>Jobs Ready</small><b class="ready" id="readyJobs">0</b><div class="sub">Ready for mobilization</div></div>
+<div class="opsCard"><small>Active Operations</small><b id="activeOps">0</b><div class="sub">Jobs currently ongoing</div></div>
+<div class="opsCard"><small>Maintenance Due</small><b id="maintenanceDue">1</b><div class="sub">Equipment requiring review</div></div>
+</div>
+<div class="twoCol" style="margin-top:14px">
+<div class="opsCard"><h3>Job Readiness</h3><div id="readiness"></div></div>
+<div class="opsCard"><h3>Live Operations Update</h3><div id="liveOps" class="liveUpdate"></div></div>
+</div>
+</section>
+
+
+
+<section class="twoCol">
+<div class="panel"><div class="head"><div><h2>Tool Inventory</h2><div class="sub">Availability is checked automatically across overlapping jobs.</div></div></div><div id="inventoryTable" class="table"></div></div>
+<div class="panel"><h2>Conflict Alerts</h2><div id="alerts"></div></div>
+</section>
+
+<section class="panel" id="operationsManagement">
+  <div class="head">
+    <div>
+      <h2>Operations Management</h2>
+      <div class="sub">Crew, mobilization, readiness, maintenance, documents, live updates and KPIs.</div>
+    </div>
+    <span class="badge">CONTROL CENTER</span>
+  </div>
+
+  <div class="opsGrid">
+    <div class="opsCard">
+      <h3>Needs Attention</h3>
+      <div class="attentionList">
+        <div><b>Tool Conflicts</b><span class="warn" id="attentionTool">0</span></div>
+        <div><b>Crew Conflicts</b><span id="crewConflict">0</span></div>
+        <div><b>Jobs Not Ready</b><span id="jobsNotReady">0</span></div>
+        <div><b>Maintenance Due</b><span id="maintAttention">1</span></div>
+        <div><b>Stale Updates</b><span id="staleUpdates">0</span></div>
+      </div>
+    </div>
+
+    <div class="opsCard">
+      <h3>Mobilization Board</h3>
+      <div class="miniBoard">
+        <span>Preparing <b id="mobPreparing">0</b></span>
+        <span>Ready <b id="mobReady">0</b></span>
+        <span>Mobilizing <b id="mobMobilizing">0</b></span>
+        <span>At Site <b id="mobSite">0</b></span>
+        <span>Operating <b id="mobOperating">0</b></span>
+        <span>Demobilizing <b id="mobDemo">0</b></span>
+      </div>
+    </div>
+
+    <div class="opsCard">
+      <h3>Operations KPIs</h3>
+      <div class="kpiMini">
+        <div><small>Jobs This Month</small><b id="kpiMonth">0</b></div>
+        <div><small>Tool Utilization</small><b id="kpiUtil">0%</b></div>
+        <div><small>On-Time</small><b id="kpiOnTime">100%</b></div>
+        <div><small>Open NPT</small><b id="kpiNpt">0</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="twoCol">
+    <div class="opsCard">
+      <div class="head"><h3>Crew Management</h3><button class="ghost" type="button" onclick="addCrew()">+ Crew</button></div>
+      <div id="crewTable" class="table"></div>
+    </div>
+    <div class="opsCard">
+      <div class="head"><h3>Tool Allocation & Serial Numbers</h3><button class="ghost" type="button" onclick="addSerialTool()">+ Unit</button></div>
+      <div id="serialTable" class="table"></div>
+    </div>
+  </div>
+
+  <div class="twoCol">
+    <div class="opsCard">
+      <h3>Job Readiness Checklist</h3>
+      <div class="sub">Personnel · Tools · Spares · Transport · HSE · Client Confirmation · Reports</div>
+      <div id="readinessChecklist"></div>
+    </div>
+    <div class="opsCard">
+      <div class="head"><h3>Maintenance & Tool History</h3><button class="ghost" type="button" onclick="addMaintenance()">+ Maintenance</button></div>
+      <div id="maintenanceTable" class="table"></div>
+    </div>
+  </div>
+
+  <div class="twoCol">
+    <div class="opsCard">
+      <div class="head"><h3>Live Operations Updates</h3><button class="ghost" type="button" onclick="addLiveUpdate()">+ Update</button></div>
+      <div id="liveOperations"></div>
+    </div>
+    <div class="opsCard">
+      <h3>Documents & Reports</h3>
+      <div class="docGrid">
+        <span>Program</span><span>BHA</span><span>Daily Report</span><span>Surveys</span>
+        <span>EOWR</span><span>Tool Sheet</span><span>HSE</span><span>Client Files</span>
+      </div>
+      <div class="sub" style="margin-top:10px">Document status is tracked per job.</div>
+    </div>
+  </div>
+
+  <div class="opsCard">
+    <h3>Notifications & Activity Log</h3>
+    <div id="notifications"></div>
+    <div id="activityLog" class="activity"></div>
+  </div>
+</section>
+
+</main>
+
+<dialog id="jobDlg"><form class="form" id="jobForm"><h2 id="jobTitle">Add Job</h2>
+<input type="hidden" id="jobId">
+<label>Job / Well<input id="jname" required placeholder="e.g. R47 / ADWOC19"></label>
+<label>Client / Rig<input id="jclient" placeholder="e.g. Waha Oil / Rig 19"></label>
+<label>Service Line<select id="jservice"><option>DD / MWD</option><option>Gyro / WL</option><option>Other</option></select></label>
+<div class="row2"><label>Start Date<input id="jstart" type="date" required></label><label>End Date<input id="jend" type="date" required></label></div>
+<label>Status<select id="jstatus"><option>Planned</option><option>Ongoing</option><option>Completed</option></select></label>
+<label>Required Tool<select id="jtool"></select></label>
+<label>Quantity Required<input id="jqty" type="number" min="0" value="0"></label>
+<div class="actions"><button type="button" id="deleteJob" class="danger" onclick="removeJob()">Delete</button><div class="right"><button type="button" class="ghost" onclick="jobDlg.close()">Cancel</button><button class="primary">Save</button></div></div>
+<div class="hint">Prototype data is saved on this browser/device.</div>
+</form></dialog>
+
+<dialog id="toolDlg"><form class="form" id="toolForm"><h2>Add Inventory Tool</h2>
+<label>Tool Type<input id="tname" required placeholder='e.g. Motor'></label>
+<label>Size<input id="tsize" required placeholder='e.g. 8"'></label>
+<label>Total Quantity<input id="tqty" type="number" min="0" required value="1"></label>
+<div class="actions"><span></span><div class="right"><button type="button" class="ghost" onclick="toolDlg.close()">Cancel</button><button class="primary">Save Tool</button></div></div>
+</form></dialog>
+
+<script>
+const DAY=86400000;
+const defaultTools=[{id:'motor8',name:'Motor',size:'8"',qty:6},{id:'motor675',name:'Motor',size:'6 3/4"',qty:4},{id:'motor475',name:'Motor',size:'4 3/4"',qty:4},{id:'nmdc475',name:'NMDC',size:'4 3/4"',qty:6},{id:'ubho475',name:'NM UBHO',size:'4 3/4"',qty:6},{id:'pulser',name:'MWD Pulser',size:'APS',qty:5}];
+const defaultJobs=[
+{id:1,name:'R47 / ADWOC19',client:'Waha Oil',service:'DD / MWD',start:'2026-09-18',end:'2026-09-23',status:'Ongoing',tool:'motor8',qty:2},
+{id:2,name:'H53I / Al-Laheeb01',client:'AGOCO',service:'DD / MWD',start:'2026-09-20',end:'2026-09-25',status:'Ongoing',tool:'motor8',qty:2},
+{id:3,name:'C23HR-47',client:'SOC',service:'DD / MWD',start:'2026-09-21',end:'2026-09-26',status:'Planned',tool:'motor8',qty:2},
+{id:4,name:'Gyro Orientation',client:'Operations',service:'Gyro / WL',start:'2026-09-22',end:'2026-09-24',status:'Planned',tool:'pulser',qty:0}
+];
+let tools=JSON.parse(localStorage.getItem('ldc_tools_v2')||'null')||defaultTools;
+let jobs=JSON.parse(localStorage.getItem('ldc_jobs_v2')||'null')||defaultJobs;
+const $=id=>document.getElementById(id), iso=d=>new Date(d).toISOString().slice(0,10);
+function persist(){localStorage.setItem('ldc_tools_v2',JSON.stringify(tools));localStorage.setItem('ldc_jobs_v2',JSON.stringify(jobs));render()}
+function toolName(id){let t=tools.find(x=>x.id===id);return t?t.name+' '+t.size:'No tool'}
+function cls(s){return s==='DD / MWD'?'dd':s==='Gyro / WL'?'gyro':'other'}
+function overlap(a,b,date){return a.start<=date&&a.end>=date&&b.start<=date&&b.end>=date}
+function conflicts(){
+ const res=[];
+ tools.forEach(t=>{
+   const dates=[...new Set(jobs.flatMap(j=>[j.start,j.end]))].sort();
+   let start=new Date(Math.min(...jobs.map(j=>new Date(j.start))),0);
+   let end=new Date(Math.max(...jobs.map(j=>new Date(j.end))),0);
+   if(!isFinite(start)||!isFinite(end))return;
+   for(let d=new Date(start);d<=end;d=new Date(d.getTime()+DAY)){
+     const ds=iso(d), active=jobs.filter(j=>j.tool===t.id&&j.start<=ds&&j.end>=ds&&j.status!=='Completed');
+     const req=active.reduce((s,j)=>s+(+j.qty||0),0);
+     if(req>t.qty)res.push({date:ds,tool:t,req,short:req-t.qty,jobs:active.map(j=>j.id)});
+   }
+ });
+ return res;
+}
+function render(){
+ $('total').textContent=jobs.length;$('ongoing').textContent=jobs.filter(j=>j.status==='Ongoing').length;$('planned').textContent=jobs.filter(j=>j.status==='Planned').length;$('completed').textContent=jobs.filter(j=>j.status==='Completed').length;
+ const cf=conflicts(), conflictIds=new Set(cf.flatMap(x=>x.jobs)); $('conflictCount').textContent=new Set(cf.map(x=>x.tool.id)).size;
+ const conflictTools=new Set(cf.map(x=>x.tool.id)).size;
+ const readinessScore=j=>{let n=45;if(j.tool&&(+j.qty||0)>0)n+=25;if(j.client)n+=15;if(j.start&&j.end)n+=15;return Math.min(100,n)};
+ const notReady=jobs.filter(j=>j.status!=='Completed'&&readinessScore(j)<85).length;
+ $('needsAttention').textContent=conflictTools+notReady;
+ $('readyJobs').textContent=jobs.filter(j=>j.status!=='Completed'&&readinessScore(j)>=85).length;
+ $('activeOps').textContent=jobs.filter(j=>j.status==='Ongoing').length;
+ $('readiness').innerHTML=jobs.filter(j=>j.status!=='Completed').slice(0,5).map(j=>{let r=readinessScore(j);return `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><b>${esc(j.name)}</b><b class="${r>=85?'ready':'warn'}">${r}%</b></div><div class="checklist"><span class="check ok">Dates ✓</span><span class="check ${j.tool&&(+j.qty||0)>0?'ok':'no'}">Tools ${j.tool&&(+j.qty||0)>0?'✓':'!'}</span><span class="check ${j.client?'ok':'no'}">Client ${j.client?'✓':'!'}</span></div></div>`}).join('')||'<div class="sub">No active jobs</div>';
+ $('liveOps').innerHTML=jobs.filter(j=>j.status==='Ongoing').map(j=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>${esc(j.name)}</b><br><span>${esc(j.client)} · ${esc(j.service)}</span><br><span class="badge">ONGOING</span> &nbsp; ${j.start} → ${j.end}</div>`).join('')||'<div class="sub">No ongoing operations</div>';
+ let min=jobs.length?new Date(Math.min(...jobs.map(j=>new Date(j.start)))):new Date(), base=new Date(min);base.setDate(base.getDate()-1);
+ const days=[...Array(21)].map((_,i)=>new Date(base.getTime()+i*DAY));
+ let h='<div class="timeline"><div class="dates"><div>JOB / WELL</div>'+days.map(d=>'<div>'+d.toLocaleDateString('en',{day:'2-digit',month:'short'})+'</div>').join('')+'</div>';
+ jobs.forEach(j=>{
+   let s=Math.max(0,Math.round((new Date(j.start)-base)/DAY)), e=Math.min(20,Math.round((new Date(j.end)-base)/DAY));
+   h+=`<div class="jobrow"><div class="joblabel"><b>${esc(j.name)}</b><small>${esc(j.client)} · ${j.status}</small></div><div class="jobbar ${cls(j.service)} ${conflictIds.has(j.id)?'conflict':''}" data-id="${j.id}" style="grid-column:${s+2}/span ${Math.max(1,e-s+1)}">${esc(j.name)}</div></div>`;
+ });
+ $('timeline').innerHTML=h+'</div>';
+ bindBars();
+ $('inventoryTable').innerHTML='<div class="tr th"><span>TOOL</span><span>TOTAL</span><span>PEAK USED</span><span>AVAILABLE</span><span></span></div>'+tools.map(t=>{
+   let peak=0; jobs.filter(j=>j.tool===t.id&&j.status!=='Completed').forEach(j=>{for(let d=new Date(j.start);d<=new Date(j.end);d=new Date(d.getTime()+DAY)){let ds=iso(d),used=jobs.filter(x=>x.tool===t.id&&x.status!=='Completed'&&x.start<=ds&&x.end>=ds).reduce((s,x)=>s+(+x.qty||0),0);peak=Math.max(peak,used)}}); let av=t.qty-peak;
+   return `<div class="tr"><span><b>${esc(t.name)}</b> <span class="badge">${esc(t.size)}</span></span><span>${t.qty}</span><span>${peak}</span><span class="${av<0?'bad':'good'}">${av}</span><button class="ghost" onclick="editToolQty('${t.id}')">Edit</button></div>`
+ }).join('');
+ if(!cf.length)$('alerts').innerHTML='<div class="empty good">✓ No tool conflicts detected.</div>'; else {
+   let grouped={};cf.forEach(c=>{let k=c.tool.id;if(!grouped[k]||c.short>grouped[k].short)grouped[k]=c});
+   $('alerts').innerHTML=Object.values(grouped).map(c=>`<div class="alertBox"><b>${esc(c.tool.name)} ${esc(c.tool.size)} shortage</b><br>Required: ${c.req} · Available: ${c.tool.qty} · <span class="bad">Shortage: ${c.short}</span><br><span class="sub">Conflict around ${c.date}</span></div>`).join('');
+ }
+ fillTools();
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function fillTools(){let old=$('jtool').value;$('jtool').innerHTML='<option value="">No tool</option>'+tools.map(t=>`<option value="${t.id}">${esc(t.name)} ${esc(t.size)} — ${t.qty} total</option>`).join('');if(old)$('jtool').value=old}
+function openJob(id){
+ $('jobForm').reset();$('jobId').value='';$('deleteJob').style.visibility='hidden';$('jobTitle').textContent='Add Job';fillTools();
+ let today=iso(new Date());$('jstart').value=today;$('jend').value=today;
+ if(id){let j=jobs.find(x=>x.id===id);if(!j)return;$('jobTitle').textContent='Edit Job';$('jobId').value=j.id;$('jname').value=j.name;$('jclient').value=j.client;$('jservice').value=j.service;$('jstart').value=j.start;$('jend').value=j.end;$('jstatus').value=j.status;$('jtool').value=j.tool||'';$('jqty').value=j.qty||0;$('deleteJob').style.visibility='visible'}
+ $('jobDlg').showModal();
+}
+$('jobForm').onsubmit=e=>{e.preventDefault();if($('jend').value<$('jstart').value){alert('End date must be after start date.');return}let id=+$('jobId').value,obj={id:id||Date.now(),name:$('jname').value,client:$('jclient').value,service:$('jservice').value,start:$('jstart').value,end:$('jend').value,status:$('jstatus').value,tool:$('jtool').value,qty:+$('jqty').value||0};if(id)jobs=jobs.map(j=>j.id===id?obj:j);else jobs.push(obj);$('jobDlg').close();persist()}
+function removeJob(){let id=+$('jobId').value;if(id&&confirm('Delete this job?')){jobs=jobs.filter(j=>j.id!==id);$('jobDlg').close();persist()}}
+function openTool(){$('toolForm').reset();$('tqty').value=1;$('toolDlg').showModal()}
+$('toolForm').onsubmit=e=>{e.preventDefault();tools.push({id:'t'+Date.now(),name:$('tname').value,size:$('tsize').value,qty:+$('tqty').value});$('toolDlg').close();persist()}
+function editToolQty(id){let t=tools.find(x=>x.id===id),q=prompt(`Total quantity for ${t.name} ${t.size}:`,t.qty);if(q!==null&&!isNaN(q)&&+q>=0){t.qty=+q;persist()}}
+function bindBars(){
+ document.querySelectorAll('.jobbar').forEach(el=>{
+   let sx=0,mode='move',moved=false,id=+el.dataset.id;
+   el.addEventListener('pointerdown',e=>{sx=e.clientX;moved=false;let r=el.getBoundingClientRect();mode=e.clientX>r.right-18?'resize':'move';el.setPointerCapture(e.pointerId)});
+   el.addEventListener('pointermove',e=>{if(!el.hasPointerCapture(e.pointerId))return;if(Math.abs(e.clientX-sx)>8)moved=true});
+   el.addEventListener('pointerup',e=>{let dx=e.clientX-sx;if(moved){let shift=Math.round(dx/42),j=jobs.find(x=>x.id===id);if(shift){if(mode==='resize'){let nd=new Date(j.end);nd.setDate(nd.getDate()+shift);if(nd>=new Date(j.start))j.end=iso(nd)}else{['start','end'].forEach(k=>{let d=new Date(j[k]);d.setDate(d.getDate()+shift);j[k]=iso(d)})}persist()}}else openJob(id)});
+ });
+}
+render();
+
+const defaultCrew=[
+ {name:'Abd',role:'DD / MWD',status:'On Job',job:'R47 / ADWOC19'},
+ {name:'Ali',role:'DD / MWD',status:'Available',job:'—'},
+ {name:'Ahmed',role:'Gyro / WL',status:'On Job',job:'Gyro Orientation'}
+];
+const defaultSerialTools=[
+ {unit:'M40-800-BDA25675',type:'Motor 8"',status:'On Job',job:'R47 / ADWOC19'},
+ {unit:'M40-800-0051',type:'Motor 8"',status:'Available',job:'—'},
+ {unit:'APS-1351',type:'MWD Pulser',status:'Maintenance',job:'—'}
+];
+const defaultMaint=[
+ {unit:'APS-1351',last:'2026-09-01',next:'2026-09-19',status:'Due'},
+ {unit:'M40-800-0051',last:'2026-09-10',next:'2026-10-10',status:'OK'}
+];
+const defaultLive=[
+ {job:'R47 / ADWOC19',op:'Drilling 12.25" section',depth:'3,125 ft',next:'Continue drilling',updated:'2h ago'},
+ {job:'H53I / Al-Laheeb01',op:'RIH with BHA',depth:'—',next:'Tag TOC',updated:'5h ago'}
+];
+let crew=JSON.parse(localStorage.getItem('ldc_crew_v3')||'null')||defaultCrew;
+let serialTools=JSON.parse(localStorage.getItem('ldc_serial_v3')||'null')||defaultSerialTools;
+let maint=JSON.parse(localStorage.getItem('ldc_maint_v3')||'null')||defaultMaint;
+let liveUpdates=JSON.parse(localStorage.getItem('ldc_live_v3')||'null')||defaultLive;
+let activity=JSON.parse(localStorage.getItem('ldc_activity_v3')||'null')||['Operations Management enabled','Timeline moved to top of dashboard'];
+
+function saveOps(){
+ localStorage.setItem('ldc_crew_v3',JSON.stringify(crew));
+ localStorage.setItem('ldc_serial_v3',JSON.stringify(serialTools));
+ localStorage.setItem('ldc_maint_v3',JSON.stringify(maint));
+ localStorage.setItem('ldc_live_v3',JSON.stringify(liveUpdates));
+ localStorage.setItem('ldc_activity_v3',JSON.stringify(activity));
+ renderOpsManagement();
+}
+function logAction(t){activity.unshift(new Date().toLocaleString()+' — '+t);activity=activity.slice(0,20)}
+function readinessFor(j){
+ let score=35;
+ if(j.tool && (+j.qty||0)>0)score+=20;
+ if(j.client)score+=10;
+ if(j.status==='Ongoing')score+=20;
+ if(crew.some(c=>c.job===j.name))score+=15;
+ return Math.min(100,score);
+}
+function renderOpsManagement(){
+ if(!document.getElementById('operationsManagement'))return;
+ const cf=conflicts(), conflictIds=new Set(cf.flatMap(x=>x.jobs));
+ const notReady=jobs.filter(j=>j.status!=='Completed'&&readinessFor(j)<80).length;
+ document.getElementById('attentionTool').textContent=new Set(cf.map(x=>x.tool.id)).size;
+ document.getElementById('jobsNotReady').textContent=notReady;
+ document.getElementById('crewConflict').textContent=0;
+ document.getElementById('maintAttention').textContent=maint.filter(x=>x.status==='Due').length;
+ document.getElementById('staleUpdates').textContent=liveUpdates.filter(x=>parseInt(x.updated)>12).length||0;
+ document.getElementById('kpiMonth').textContent=jobs.length;
+ let total=tools.reduce((s,t)=>s+t.qty,0), used=jobs.filter(j=>j.status==='Ongoing').reduce((s,j)=>s+(+j.qty||0),0);
+ document.getElementById('kpiUtil').textContent=(total?Math.round(used/total*100):0)+'%';
+
+ const stages={Preparing:0,Ready:0,Mobilizing:0,'At Site':0,Operating:0,Demobilizing:0};
+ jobs.filter(j=>j.status!=='Completed').forEach(j=>{ if(j.status==='Ongoing')stages.Operating++; else if(readinessFor(j)>=80)stages.Ready++; else stages.Preparing++; });
+ document.getElementById('mobPreparing').textContent=stages.Preparing;document.getElementById('mobReady').textContent=stages.Ready;
+ document.getElementById('mobMobilizing').textContent=stages.Mobilizing;document.getElementById('mobSite').textContent=stages['At Site'];
+ document.getElementById('mobOperating').textContent=stages.Operating;document.getElementById('mobDemo').textContent=stages.Demobilizing;
+
+ document.getElementById('crewTable').innerHTML='<div class="tr th"><span>NAME</span><span>ROLE</span><span>STATUS</span><span>JOB</span></div>'+crew.map(c=>`<div class="tr"><span>${esc(c.name)}</span><span>${esc(c.role)}</span><span>${esc(c.status)}</span><span>${esc(c.job)}</span></div>`).join('');
+ document.getElementById('serialTable').innerHTML='<div class="tr th"><span>SERIAL</span><span>TYPE</span><span>STATUS</span><span>JOB</span></div>'+serialTools.map(t=>`<div class="tr"><span>${esc(t.unit)}</span><span>${esc(t.type)}</span><span>${esc(t.status)}</span><span>${esc(t.job)}</span></div>`).join('');
+ document.getElementById('maintenanceTable').innerHTML='<div class="tr th"><span>UNIT</span><span>LAST</span><span>NEXT</span><span>STATUS</span></div>'+maint.map(x=>`<div class="tr"><span>${esc(x.unit)}</span><span>${x.last}</span><span>${x.next}</span><span><i class="statusPill ${x.status==='Due'?'due':''}">${x.status}</i></span></div>`).join('');
+ document.getElementById('readinessChecklist').innerHTML=jobs.filter(j=>j.status!=='Completed').map(j=>{let r=readinessFor(j);return `<div class="readinessRow"><b>${esc(j.name)}</b><div class="progress"><i style="width:${r}%"></i></div><b>${r}%</b></div>`}).join('');
+ document.getElementById('liveOperations').innerHTML=liveUpdates.map(x=>`<div class="liveUpdate"><b>${esc(x.job)}</b><div>${esc(x.op)} · ${esc(x.depth)}</div><small>Next: ${esc(x.next)} · Updated ${esc(x.updated)}</small></div>`).join('');
+ const notes=[];
+ cf.slice(0,3).forEach(x=>notes.push(`<div class="notice warn">⚠ ${esc(x.tool.name+' '+x.tool.size)} — Required ${x.req}, Available ${x.tool.qty}, Shortage ${x.short}</div>`));
+ jobs.filter(j=>j.status!=='Completed'&&readinessFor(j)<80).slice(0,3).forEach(j=>notes.push(`<div class="notice">○ ${esc(j.name)} readiness is ${readinessFor(j)}%</div>`));
+ document.getElementById('notifications').innerHTML=notes.join('')||'<div class="notice">No critical notifications.</div>';
+ document.getElementById('activityLog').innerHTML=activity.map(a=>`<div>${esc(a)}</div>`).join('');
+}
+function addCrew(){let name=prompt('Crew name');if(!name)return;let role=prompt('Role / Service Line','DD / MWD')||'Operations';crew.push({name,role,status:'Available',job:'—'});logAction('Crew added: '+name);saveOps()}
+function addSerialTool(){let unit=prompt('Serial number');if(!unit)return;let type=prompt('Tool type / size','Motor 8"')||'Tool';serialTools.push({unit,type,status:'Available',job:'—'});logAction('Tool unit added: '+unit);saveOps()}
+function addMaintenance(){let unit=prompt('Unit / serial number');if(!unit)return;maint.push({unit,last:new Date().toISOString().slice(0,10),next:'TBD',status:'Due'});logAction('Maintenance item added: '+unit);saveOps()}
+function addLiveUpdate(){let job=prompt('Job / Well');if(!job)return;let op=prompt('Current operation')||'Update';let depth=prompt('Current depth','—')||'—';let next=prompt('Next operation','—')||'—';liveUpdates.unshift({job,op,depth,next,updated:'just now'});logAction('Live update added: '+job);saveOps()}
+const _renderBase=render;
+render=function(){_renderBase();renderOpsManagement()}
+
+</script>
+<script>setTimeout(()=>{try{renderOpsManagement()}catch(e){}},0)</script>
+</body></html>
